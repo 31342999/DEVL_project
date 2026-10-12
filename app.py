@@ -276,19 +276,19 @@ computed_period_str = f"{min_date.strftime('%d %b %Y')} to {max_date.strftime('%
 
 
 # ==============================================================================
-# 5. DASHBOARD HEADER
+# 5. DASHBOARD HEADER & ACADEMIC PROJECT SCOPE
 # ==============================================================================
 st.markdown('<div class="dashboard-header">', unsafe_allow_html=True)
 header_col1, header_col2 = st.columns([3, 1])
 
 with header_col1:
-    st.title("UPI Transaction Analytics Dashboard")
+    st.title("UPI Transaction Analytics")
+    st.markdown("### Exploring Payment Behavior, Transaction Reliability and Fraud Patterns in India")
     st.markdown(
-        f"**Purpose:** Interactive visual exploration of payment velocity, banking infrastructure reliability, "
-        f"and security risk patterns across 250,000 simulated Indian UPI transactions.<br>"
-        f"<span class='badge-authors'>Swaraj Suresh Shinde (PRN: 125B1D053) & Nikol Dharmraj Ghodke (PRN: 125B1D062)</span> "
-        f"<span class='badge-course'>Data Exploration & Visualization Lab</span>",
-        unsafe_allow_html=True
+        "**Subject:** Data Exploration and Visualization Laboratory  \n"
+        "**Submitted By:**  \n"
+        "• **Swaraj Suresh Shinde** — 125B1D053  \n"
+        "• **Nikol Dharmraj Ghodke** — 125B1D062"
     )
 
 with header_col2:
@@ -296,6 +296,38 @@ with header_col2:
     st.caption(f"Showing **{len(filtered_df):,}** of **{len(df_raw):,}** transactions ({(len(filtered_df)/len(df_raw)*100):.1f}%)")
 
 st.markdown('</div>', unsafe_allow_html=True)
+
+with st.container(border=True):
+    scope_col1, scope_col2 = st.columns([1.15, 0.85])
+    with scope_col1:
+        st.markdown("""
+#### 1. Dataset and Problem Statement
+- **Dataset:** UPI Transactions 2024
+- **Source:** [Kaggle Dataset](https://www.kaggle.com/datasets/skullagos5246/upi-transactions-2024-dataset)
+- **Description:** The dataset contains 250,000 simulated UPI transactions with details such as transaction amount, type, status, bank, state, device, network and fraud flag.
+- **Problem Statement:** To analyze UPI transaction patterns and identify trends in payment behavior, transaction failures and fraud across different banks, states, devices and transaction types.
+
+**Objectives:**
+- Analyze transaction amounts and categories.
+- Study transaction activity over time.
+- Examine transaction failure patterns.
+- Explore fraud-related patterns.
+- Present findings through visualizations and an interactive dashboard.
+        """)
+    with scope_col2:
+        st.markdown("""
+**Key Questions:**
+1. Which transaction types are most common?
+2. Which merchant categories have the most transactions?
+3. How are transaction amounts distributed?
+4. When is transaction activity highest?
+5. Which banks have the highest failure percentages?
+6. How do failures vary by device and network?
+7. Which states have the most fraud-flagged transactions?
+8. How does fraud vary across transaction types?
+9. Is transaction amount associated with fraud flags?
+10. What relationships exist between numerical variables?
+        """)
 
 
 # ==============================================================================
