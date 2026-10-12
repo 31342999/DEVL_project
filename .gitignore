@@ -1,0 +1,29 @@
+# Virtual environment
+.venv/
+venv/
+env/
+ENV/
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# IDE and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary test & scratch artifacts
+scratch/
+
+# OS and Office temporary files
+.DS_Store
+Thumbs.db
+~$*
+*.tmp
