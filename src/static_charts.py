@@ -2,7 +2,9 @@
 UPI Transaction Analytics - Exploratory Analysis Static Visualizations
 Recreates every chart from mini-project.ipynb using Matplotlib and Seaborn.
 """
+import base64
 import io
+import pathlib
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -348,11 +350,32 @@ CHARTS_REGISTRY = [
 CHARTS_BY_ID = {c["id"]: c["fn"] for c in CHARTS_REGISTRY}
 
 
+STATIC_CHARTS_DIR = pathlib.Path(__file__).resolve().parent.parent / "outputs" / "static_charts"
+
+
 @st.cache_data(show_spinner=False)
-def get_chart_png(chart_id: int, _df: pd.DataFrame) -> bytes:
-    """Cached generator returning PNG bytes for requested chart ID."""
-    fn = CHARTS_BY_ID.get(chart_id)
-    if fn is None:
-        raise ValueError(f"Unknown chart_id: {chart_id}")
-    return fn(_df)
+def get_chart_png(chart_id: int, _df: pd.DataFrame) -> str:
+    """
+    Returns base64 data URI for requested chart ID.
+    Direct base64 data URI embedding avoids Streamlit Cloud /media/ 404 routing bugs
+    and ensures instant, 100% reliable rendering across all web and local browsers.
+    """
+    file_path = STATIC_CHARTS_DIR / f"chart_{chart_id}.png"
+    if file_path.exists():
+        with open(file_path, "rb") as f:
+            raw_bytes = f.read()
+    else:
+        fn = CHARTS_BY_ID.get(chart_id)
+        if fn is None:
+            raise ValueError(f"Unknown chart_id: {chart_id}")
+        raw_bytes = fn(_df)
+        try:
+            STATIC_CHARTS_DIR.mkdir(parents=True, exist_ok=True)
+            with open(file_path, "wb") as f:
+                f.write(raw_bytes)
+        except Exception:
+            pass
+
+    b64 = base64.b64encode(raw_bytes).decode("ascii")
+    return f"data:image/png;base64,{b64}"
 
