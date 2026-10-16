@@ -1,9 +1,7 @@
-# Pinned dependencies verified in project runtime (Python 3.12)
-pandas==3.0.2
-numpy==2.4.4
-matplotlib==3.11.1
-seaborn==0.13.2
-plotly==7.1.0
-streamlit==1.57.0  # Requires Streamlit >=1.42.0 for width="stretch" support
-scikit-learn==1.9.1
-scipy==1.18.0
+streamlit>=1.50.0
+pandas>=2.0.0
+numpy>=1.24.0
+plotly>=5.15.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+scipy>=1.10.0

@@ -17,7 +17,7 @@ if str(root_dir) not in sys.path:
 # Modular helper imports
 from src.data_loader import load_data
 from src.metrics import compute_kpis, compute_hourly_traffic, compute_bank_metrics
-from src.static_charts import CHARTS_REGISTRY, CHARTS_BY_ID, get_chart_png
+from src.static_charts import CHARTS_REGISTRY, CHARTS_BY_ID, get_chart_png, get_chart_data_uri
 from src.inference import get_inference
 
 # ==============================================================================
@@ -253,10 +253,16 @@ def render_exploratory_analysis_section(df: pd.DataFrame):
     def render_collapsed_card(chart_meta):
         cid = chart_meta["id"]
         title = chart_meta["title"]
-        img_bytes = get_chart_png(cid, df)
         with st.container(border=True):
             st.markdown(f"**#{cid}. {title}**")
-            st.image(img_bytes, width="stretch")
+            try:
+                uri = get_chart_data_uri(cid, df)
+                st.markdown(
+                    f'<img src="{uri}" alt="{title}" style="width:100%; height:auto; border-radius:6px;">',
+                    unsafe_allow_html=True,
+                )
+            except Exception as exc:
+                st.error(f"Chart {cid} failed to render: {exc}")
             if st.button("Click to enlarge / view inference", key=f"btn_exp_{cid}", width="stretch"):
                 st.session_state["expanded_chart"] = cid
                 st.rerun(scope="fragment")
@@ -264,7 +270,6 @@ def render_exploratory_analysis_section(df: pd.DataFrame):
     def render_expanded_view(cid):
         chart_meta = next(c for c in CHARTS_REGISTRY if c["id"] == cid)
         title = chart_meta["title"]
-        img_bytes = get_chart_png(cid, df)
         inf = get_inference(cid, df)
         is_left = (cid % 2 == 1)
 
@@ -276,7 +281,14 @@ def render_exploratory_analysis_section(df: pd.DataFrame):
         with col_chart:
             with st.container(border=True):
                 st.markdown(f"#### #{cid}. {title}")
-                st.image(img_bytes, width="stretch")
+                try:
+                    uri = get_chart_data_uri(cid, df)
+                    st.markdown(
+                        f'<img src="{uri}" alt="{title}" style="width:100%; height:auto; border-radius:6px;">',
+                        unsafe_allow_html=True,
+                    )
+                except Exception as exc:
+                    st.error(f"Chart {cid} failed to render: {exc}")
 
         with col_inf:
             with st.container(border=True):

@@ -354,28 +354,36 @@ STATIC_CHARTS_DIR = pathlib.Path(__file__).resolve().parent.parent / "outputs" /
 
 
 @st.cache_data(show_spinner=False)
-def get_chart_png(chart_id: int, _df: pd.DataFrame) -> str:
+def get_chart_png(chart_id: int, _df: pd.DataFrame) -> bytes:
+    """Cached generator returning raw PNG bytes for requested chart ID."""
+    file_path = STATIC_CHARTS_DIR / f"chart_{chart_id}.png"
+    if file_path.exists():
+        with open(file_path, "rb") as f:
+            return f.read()
+
+    fn = CHARTS_BY_ID.get(chart_id)
+    if fn is None:
+        raise ValueError(f"Unknown chart_id: {chart_id}")
+    raw_bytes = fn(_df)
+    try:
+        STATIC_CHARTS_DIR.mkdir(parents=True, exist_ok=True)
+        with open(file_path, "wb") as f:
+            f.write(raw_bytes)
+    except Exception:
+        pass
+    return raw_bytes
+
+
+@st.cache_data(show_spinner=False)
+def get_chart_data_uri(cid: int, _df: pd.DataFrame) -> str:
     """
     Returns base64 data URI for requested chart ID.
     Direct base64 data URI embedding avoids Streamlit Cloud /media/ 404 routing bugs
     and ensures instant, 100% reliable rendering across all web and local browsers.
+    Leading underscore in _df prevents re-hashing 250k rows on reruns.
     """
-    file_path = STATIC_CHARTS_DIR / f"chart_{chart_id}.png"
-    if file_path.exists():
-        with open(file_path, "rb") as f:
-            raw_bytes = f.read()
-    else:
-        fn = CHARTS_BY_ID.get(chart_id)
-        if fn is None:
-            raise ValueError(f"Unknown chart_id: {chart_id}")
-        raw_bytes = fn(_df)
-        try:
-            STATIC_CHARTS_DIR.mkdir(parents=True, exist_ok=True)
-            with open(file_path, "wb") as f:
-                f.write(raw_bytes)
-        except Exception:
-            pass
-
+    raw_bytes = get_chart_png(cid, _df)
     b64 = base64.b64encode(raw_bytes).decode("ascii")
     return f"data:image/png;base64,{b64}"
+
 
